@@ -1,0 +1,33 @@
+class Solution {
+    public int[] maxValue(int[] nums) {
+        int n = nums.length;
+        int[] ans = new int[n];
+
+        // Stack entries: [start, end, maxVal, minVal]
+        int[][] stack = new int[n][4];
+        int top = -1;
+
+        for (int j = 0; j < n; j++) {
+            int start = j, end = j, maxVal = nums[j], minVal = nums[j];
+
+            // Merge with left neighbor while an inversion exists across the boundary:
+            // left.max > right.min means some left element > some right element → connected
+            while (top >= 0 && stack[top][2] > minVal) {
+                start  = stack[top][0];
+                maxVal = Math.max(maxVal, stack[top][2]);
+                minVal = Math.min(minVal, stack[top][3]);
+                top--;
+            }
+
+            stack[++top] = new int[]{start, end, maxVal, minVal};
+        }
+
+        // Every index in a component gets that component's max value
+        for (int i = 0; i <= top; i++) {
+            int s = stack[i][0], e = stack[i][1], m = stack[i][2];
+            for (int j = s; j <= e; j++) ans[j] = m;
+        }
+
+        return ans;
+    }
+}
